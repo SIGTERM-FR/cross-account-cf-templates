@@ -1,0 +1,43 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: Create a Read Only role with Billing access for Sigterm and outputs the ARN
+Resources:
+  SigtermCrossAccountRole:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      RoleName: "SigtermMonitoringReadOnly"
+      AssumeRolePolicyDocument:
+        Statement:
+          - Action: 'sts:AssumeRole'
+            Effect: Allow
+            Principal:
+              AWS: 'arn:aws:iam::766532352530:root'
+      ManagedPolicyArns:
+        - 'arn:aws:iam::aws:policy/ReadOnlyAccess'
+        - 'arn:aws:iam::aws:policy/WellArchitectedConsoleFullAccess'
+      Policies:
+        - 
+          PolicyName: "Sigterm-billing-access"
+          PolicyDocument: 
+            Version: "2012-10-17"
+            Statement: 
+              - 
+                Effect: "Allow"
+                Action:
+                  - "aws-portal:ViewUsage"
+                  - "aws-portal:*Billing"
+                  - "awsbillingconsole:*Billing"
+                  - "aws-portal:*Usage"
+                  - "awsbillingconsole:*Usage"
+                  - "aws-portal:*PaymentMethods"
+                  - "awsbillingconsole:*PaymentMethods"
+                  - "budgets:ViewBudget"
+                  - "budgets:ModifyBudget"
+                  - "cur:*"
+                Resource: "*"
+
+Outputs:
+  SigtermRoleArn:
+    Description: The ARN of the role created for SIGTERM
+    Value: !GetAtt
+      - SigtermCrossAccountRole
+      - Arn
